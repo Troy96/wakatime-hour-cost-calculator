@@ -1,21 +1,48 @@
-//ACCESS TOKEN = sec_rZLKZcjebOPkQykTTenzIhOlal2YlTfhQx2ZzH1pTKiSutGHM7YWdLL5BA3K37LTItzGXUGyAGWANcUK
+import * as Axios from 'axios';
+import * as qs from 'querystring';
 
-//REFRESH TOKEN = ref_o8vW5qbuZhTTO9jjajDLEDBb4ZdvegoQiDmZcgvOzoATIj7MOBLGluVzTxENQ37gR17zedQkGmTkV5TX
+import * as CONFIG from './config';
 
-//uid = 465cfbe4-2b6b-413c-88cf-9890bf9f5fb9
+class WakaTimeBase {
 
-//Token type - bearer
+    constructor() { }
 
-//43200 EXPIRES_IN
+    async getToken() {
+        try {
+            
+            const requestObj = {
+                client_id: CONFIG.CLIENT_ID,
+                client_secret: CONFIG.CLIENT_SECRET,
+                grant_type: CONFIG.GRANT_TYPE,
+                refresh_token: CONFIG.REFRESH_TOKEN,
+                redirect_uri: CONFIG.REDIRECT_URI
+            }
 
-//ACCESS_TOKEN - sec_V1WlBt6Aa2kJE68bD7Hh1ucaZbBqXSmUHWmDnZSMfN5vrHmeDh59Gtu5vJhNjP0lXuG1ZmfXtDgXFNMm
+            const headers = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+
+            const responseObj = await Axios.default.post(CONFIG.WAKATIME_TOKEN_ENDPOINT, qs.stringify(requestObj), headers);
+
+            console.log(responseObj.data)
+
+        }
+        catch (e) {
+            console.log(e.response.data)
+        }
+    }
 
 
-// {
-//     "access_token": "sec_V1WlBt6Aa2kJE68bD7Hh1ucaZbBqXSmUHWmDnZSMfN5vrHmeDh59Gtu5vJhNjP0lXuG1ZmfXtDgXFNMm",
-//     "expires_in": 5184000,
-//     "refresh_token": "ref_SCmsdL8RAiMJQVyKs4xr0aK9AOfRlE4FFMT0H9Yn2Z3jrPLf562s6AldxSYesIeZ9yYkXLTYliVZdIAu",
-//     "scope": "read_logged_time,read_stats,write_logged_time,email",
-//     "token_type": "bearer",
-//     "uid": "465cfbe4-2b6b-413c-88cf-9890bf9f5fb9"
-// }
+}
+
+const wakaTime = new WakaTimeBase();
+
+wakaTime.getToken();
+
+
+
+export {
+    WakaTimeBase
+}
