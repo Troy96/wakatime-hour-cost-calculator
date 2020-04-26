@@ -9,7 +9,9 @@ const config = {
     GRANT_TYPE: process.env.GRANT_TYPE || '',
     REDIRECT_URI: process.env.REDIRECT_URI || '',
     CLIENT_ID: process.env.CLIENT_ID || '',
-    CLIENT_SECRET: process.env.CLIENT_SECRET || ''
+    CLIENT_SECRET: process.env.CLIENT_SECRET || '',
+    PROJECT_NAME: process.env.PROJECT_NAME || '',
+    COSTPERHOUR: process.env.COSTPERHOUR || ''
 }
 
 if (!config.WAKATIME_TOKEN_ENDPOINT) throw new Error('> WAKATIME_TOKEN_ENDPOINT NOT FOUND');
@@ -19,5 +21,8 @@ if (!config.REDIRECT_URI) throw new Error('> REDIRECT_URI NOT FOUND');
 if (!config.GRANT_TYPE) throw new Error('> GRANT_TYPE NOT FOUND');
 if (!config.CLIENT_ID) throw new Error('> CLIENT_ID NOT FOUND');
 if (!config.CLIENT_SECRET) throw new Error('> CLIENT_SECRET NOT FOUND');
+if (!config.PROJECT_NAME) throw new Error('> PROJECT_NAME NOT FOUND');
+if (!config.COSTPERHOUR) throw new Error('> COSTPERHOUR NOT FOUND');
+
 
 export = config;
