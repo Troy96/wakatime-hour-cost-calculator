@@ -1,5 +1,7 @@
 import * as Axios from 'axios';
 import * as qs from 'querystring';
+import moment, { Moment } from 'moment';
+
 
 import * as CONFIG from './config';
 import { Token } from './classes/token';
@@ -12,6 +14,7 @@ class WakaTimeBase {
     private accessToken: string;
     private refreshToken: string;
     private totalHours: number = 0;
+    private now: Moment = moment();
 
     constructor() { }
 
@@ -75,15 +78,23 @@ class WakaTimeBase {
         this.totalHours = this.totalHours / 3600;
     }
 
-    get costForHours(){
+    get currentDate() {
+        return this.now.format('YYYY-MM-DD');
+    }
+
+    get costForHours() {
         return this.totalHours * Number(CONFIG.COSTPERHOUR);
     }
 
     async initialize() {
-        await this.getToken(CONFIG.REFRESH_TOKEN);
+        console.log(this.currentDate);
+            await this.getToken(CONFIG.REFRESH_TOKEN);
         const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, '2020-04-17');
         await this.calculateTimeDurationForDay(durationData);
         console.log(this.costForHours);
+        setInterval(() => {
+            this.getToken(this.refreshToken);
+        }, 10000)
     }
 
 

@@ -5,6 +5,7 @@
         "target": "ES6", //Specifies the output language level.
         "moduleResolution": "node", //This helps the compiler figure out what an import refers to. The Valuenode mimics the Node module resolution mechanism
         "sourceMap": true,
+        "allowSyntheticDefaultImports": true,
         "outDir": "dist" //This is the location to output .js files after transpilation. We save it as dist.
     },
     "lib": [
