@@ -98,10 +98,10 @@ class WakaTimeBase {
             console.log('>FETCHING DURATIONS...');
             const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
             this.calculateTimeDurationForDay(durationData);
-            console.log('TOTAL HOURS FOR THE DAY - ', this.totalHours);
+            console.log('TOTAL HOURS AND COST FOR THE DAY - ', this.totalHours);
         }, 15000);
 
-        // Cron.scheduleJob('0 */1 * * * *',()=>{
+        // Cron.scheduleJob('55 23 * * *',()=>{
         //     console.log('test')
         // })
     }
