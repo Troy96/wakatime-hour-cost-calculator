@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import * as config from './../../config';
+import * as config from '../config';
 
 class Mailer {
 
@@ -20,7 +20,7 @@ class Mailer {
             from: 'troy0870@gmail.com',
             to: to,
             subject: subject,
-            text: body
+            html: body
         }
         return new Promise<void>((resolve, reject) => {
             this._transporter.sendMail(options, (err, info) => {
@@ -33,6 +33,6 @@ class Mailer {
     }
 }
 
-export = {
+export {
     Mailer
 }

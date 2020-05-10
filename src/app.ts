@@ -7,6 +7,9 @@ import * as Cron from 'node-schedule';
 import * as CONFIG from './config';
 import { Token } from './classes/token';
 import { Project } from './classes/project';
+import { Mailer } from './alerts/mailer';
+
+const mailer = new Mailer()
 
 
 class WakaTimeBase {
@@ -87,23 +90,35 @@ class WakaTimeBase {
         return this.totalHours * Number(CONFIG.COSTPERHOUR);
     }
 
+    async generateReport() {
+        try {
+            console.log('>FETCHING REPORT...');
+
+            const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
+            this.calculateTimeDurationForDay(durationData);
+            const content = `<html>
+                            <p>Hey, this is Wakatime Bot!,</p>
+                            <br/>
+                            <p>Total durations for the project <b>${CONFIG.PROJECT_NAME}</b> : <b>${this.totalHours.toFixed(1)}</b>
+                            <p>Equivalent cost is <b>${this.totalHours.toFixed(1)}</b> * <b>${CONFIG.COSTPERHOUR}</b> = <b>${this.costForHours.toFixed(1)}</b></p>
+        
+                            </html>`;
+            const resp = await mailer.sendMail(CONFIG.MAILERUSERNAME, 'Wakatime Project Cost Report', content);
+            console.log('> REPORT SENT:', resp)
+        } catch (e) {
+            console.log('Some error', e);
+        }
+    }
+
     async initialize() {
         await this.getToken(CONFIG.REFRESH_TOKEN);
-        //const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
         setInterval(() => {
             this.getToken(this.refreshToken);
         }, 10000)
 
-        setTimeout(async () => {
-            console.log('>FETCHING DURATIONS...');
-            const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
-            this.calculateTimeDurationForDay(durationData);
-            console.log('TOTAL HOURS AND COST FOR THE DAY - ', this.totalHours);
-        }, 15000);
-
-        // Cron.scheduleJob('55 23 * * *',()=>{
-        //     console.log('test')
-        // })
+        Cron.scheduleJob('28 23 * * *', ()=>{
+            this.generateReport();
+        });
     }
 
 
