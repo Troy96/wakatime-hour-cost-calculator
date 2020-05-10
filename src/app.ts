@@ -1,6 +1,7 @@
 import * as Axios from 'axios';
 import * as qs from 'querystring';
 import moment, { Moment } from 'moment';
+import * as Cron from 'node-schedule';
 
 
 import * as CONFIG from './config';
@@ -87,15 +88,25 @@ class WakaTimeBase {
     }
 
     async initialize() {
-        console.log(this.currentDate);
-            await this.getToken(CONFIG.REFRESH_TOKEN);
-        const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, '2020-04-17');
-        await this.calculateTimeDurationForDay(durationData);
-        console.log(this.costForHours);
+        await this.getToken(CONFIG.REFRESH_TOKEN);
+        //const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
         setInterval(() => {
             this.getToken(this.refreshToken);
         }, 10000)
+
+        setTimeout(async () => {
+            console.log('>FETCHING DURATIONS...');
+            const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
+            this.calculateTimeDurationForDay(durationData);
+            console.log('TOTAL HOURS FOR THE DAY - ', this.totalHours);
+        }, 15000);
+
+        // Cron.scheduleJob('0 */1 * * * *',()=>{
+        //     console.log('test')
+        // })
     }
+
+
 
 
 }
