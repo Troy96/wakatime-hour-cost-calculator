@@ -114,7 +114,7 @@ class WakaTimeBase {
             this.getToken(this.refreshToken);
         }, 60000)
 
-        Cron.scheduleJob(CONFIG.CRONPATTERN, () => {
+        Cron.scheduleJob('55 21 * * *', () => {
             this.generateReport();
         });
     }
