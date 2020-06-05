@@ -4,7 +4,7 @@
   "description": "This project is used to automate the process of calculating the cost for the number of hours spent on coding a freelancing project for both the developer and the client",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js"
+    "start": "node dist/app.js"
   },
   "repository": {
     "type": "git",
