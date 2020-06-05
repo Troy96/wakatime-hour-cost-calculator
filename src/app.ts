@@ -7,9 +7,9 @@ import * as Cron from 'node-schedule';
 import * as CONFIG from './config';
 import { Token } from './classes/token';
 import { Project } from './classes/project';
-import { Mailer } from './alerts/mailer';
+import { Slack } from './alerts/slack';
 
-const mailer = new Mailer()
+const slackAlert = new Slack();
 
 
 class WakaTimeBase {
@@ -47,8 +47,6 @@ class WakaTimeBase {
             this.accessToken = tokenObj.access_token;
             this.refreshToken = tokenObj.refresh_token;
 
-            console.log(this.refreshToken, this.accessToken)
-
         }
         catch (e) {
             console.log(e.response.data)
@@ -69,6 +67,7 @@ class WakaTimeBase {
     async getDurationsByProject(project: string, date: string) {
         try {
             const respObj = await Axios.default.get(CONFIG.WAKATIME_BASE_ENDPOINT + 'users/' + this.userId + '/durations?date=' + date + '&project=' + project + '&access_token=' + this.accessToken);
+            console.log(respObj, 'fuhfgf')
             return respObj.data.data;
         } catch (e) {
             console.log(e.response.data)
@@ -79,6 +78,7 @@ class WakaTimeBase {
         projectData.map(data => {
             this.totalHours += data.duration;
         })
+        await Promise.all(projectData);
         this.totalHours = this.totalHours / 3600;
     }
 
@@ -92,19 +92,17 @@ class WakaTimeBase {
 
     async generateReport() {
         try {
-            console.log('>FETCHING REPORT...');
+            const projectList = ['india-clap-web', 'padhvaiya-backend'];
 
-            const durationData: Project[] = await this.getDurationsByProject(CONFIG.PROJECT_NAME, this.currentDate);
-            this.calculateTimeDurationForDay(durationData);
-            const content = `<html>
-                            <p>Hey, this is Wakatime Bot!,</p>
-                            <br/>
-                            <p>Total durations for the project <b>${CONFIG.PROJECT_NAME}</b> : <b>${this.totalHours.toFixed(1)}</b>
-                            <p>Equivalent cost is <b>${this.totalHours.toFixed(1)}</b> * <b>${CONFIG.COSTPERHOUR}</b> = <b>${this.costForHours.toFixed(1)}</b></p>
-        
-                            </html>`;
-            const resp = await mailer.sendMail(CONFIG.MAILERUSERNAME, 'Wakatime Project Cost Report', content);
-            console.log('> REPORT SENT:', resp)
+            projectList.forEach(async project => {
+                const durationData: Project[] = await this.getDurationsByProject(project, this.currentDate);
+                await this.calculateTimeDurationForDay(durationData);
+                await slackAlert.sendAlert([{
+                    title: `${project}: TOTAL HOURS`,
+                    value: `Total durations for the project is ${this.totalHours.toFixed(1)} and Equivalent cost is ${this.totalHours.toFixed(1)} * ${CONFIG.COSTPERHOUR} = ${this.costForHours.toFixed(1)}`
+                }]);
+            })
+
         } catch (e) {
             console.log('Some error', e);
         }
@@ -114,15 +112,12 @@ class WakaTimeBase {
         await this.getToken(CONFIG.REFRESH_TOKEN);
         setInterval(() => {
             this.getToken(this.refreshToken);
-        }, 10000)
+        }, 60000)
 
         Cron.scheduleJob(CONFIG.CRONPATTERN, () => {
             this.generateReport();
         });
     }
-
-
-
 
 }
 

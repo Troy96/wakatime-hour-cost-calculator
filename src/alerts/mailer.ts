@@ -7,7 +7,8 @@ class Mailer {
 
     constructor() {
         this._transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            secure: false,
             auth: {
                 user: config.MAILERUSERNAME,
                 pass: config.MAILERPASSWORD
@@ -24,7 +25,9 @@ class Mailer {
         }
         return new Promise<void>((resolve, reject) => {
             this._transporter.sendMail(options, (err, info) => {
+                console.log(err.message, info)
                 if (err) {
+                    
                     reject(err.message);
                 }
                 resolve(info.response);
