@@ -14,6 +14,9 @@
     "wakatime",
     "freelancing"
   ],
+  "engines": {
+    "node": "13.5.0"
+  },
   "author": "Tuhin Roy",
   "license": "ISC",
   "bugs": {
